@@ -50,7 +50,7 @@ fn run_inner<G: Guest, P: Platform, T: AsRef<[u8]>>(output_bytes_modifier: impl 
     let input_bytes = P::cycle_scope("read_input", || P::read_whole_input());
     ziskos_profile_end!(READ_INPUT);
 
-    ziskos_profile_start!(DESERIALIZE_INPUT = 12);
+    ziskos_profile_start!(DESERIALIZE_INPUT = 11);
     let input = P::cycle_scope("deserialize_input", || {
         G::Io::deserialize_input(&input_bytes).unwrap()
     });
