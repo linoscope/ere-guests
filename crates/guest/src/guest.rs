@@ -7,6 +7,7 @@ use core::convert::identity;
 use ere_io::Io;
 use ere_platform_trait::Platform;
 use sha2::{Digest, Sha256};
+use ziskos::{ziskos_profile_end, ziskos_profile_start};
 
 /// Guest program that can be ran given [`Platform`] implementation.
 pub trait Guest {
@@ -45,23 +46,31 @@ pub trait Guest {
 }
 
 fn run_inner<G: Guest, P: Platform, T: AsRef<[u8]>>(output_bytes_modifier: impl Fn(Vec<u8>) -> T) {
+    ziskos_profile_start!(READ_INPUT = 10);
     let input_bytes = P::cycle_scope("read_input", || P::read_whole_input());
+    ziskos_profile_end!(READ_INPUT);
 
+    ziskos_profile_start!(DESERIALIZE_INPUT = 12);
     let input = P::cycle_scope("deserialize_input", || {
         G::Io::deserialize_input(&input_bytes).unwrap()
     });
+    ziskos_profile_end!(DESERIALIZE_INPUT);
 
     let output = G::compute::<P>(input);
 
+    ziskos_profile_start!(SERIALIZE_OUTPUT = 12);
     let output_bytes = P::cycle_scope("serialize_output", || {
         G::Io::serialize_output(&output).unwrap()
     });
+    ziskos_profile_end!(SERIALIZE_OUTPUT);
 
+    ziskos_profile_start!(WRITE_OUTPUT = 13);
     let modified_output_bytes = output_bytes_modifier(output_bytes);
 
     P::cycle_scope("write_output", || {
         P::write_whole_output(modified_output_bytes.as_ref())
     });
+    ziskos_profile_end!(WRITE_OUTPUT);
 }
 
 /// Associated type `Io` of [`Guest`].

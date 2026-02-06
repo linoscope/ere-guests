@@ -33,6 +33,20 @@ ark-serialize = { git = "https://github.com/0xPolygonHermez/zisk-patch-ark-algeb
 aurora-engine-modexp = { git = "https://github.com/0xPolygonHermez/zisk-patch-modexp.git", tag = "patch-1.2.0-zisk-0.15.0" }
 ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
 
+[patch."https://github.com/paradigmxyz/reth"]
+reth-chainspec = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-ethereum-payload-builder = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-ethereum-primitives = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-evm-ethereum = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-primitives-traits = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-stateless = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-payload-validator = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-revm = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-storage-errors = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-trie-common = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-evm = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+reth-ethereum-consensus = { git = "https://github.com/jsign/reth", rev = "89821048bbe40597ac7e8fe1e48bb2b4dfb6e206" }
+
 [profile.release]
 codegen-units = 1
 lto = "fat"

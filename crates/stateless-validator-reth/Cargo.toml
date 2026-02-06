@@ -24,6 +24,8 @@ alloy-rpc-types-engine = { workspace = true, default-features = false, features 
     "serde",
 ] }
 
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
+
 # reth
 reth-chainspec.workspace = true
 reth-payload-validator = { workspace = true, default-features = false }

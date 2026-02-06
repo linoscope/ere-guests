@@ -33,6 +33,8 @@ reth-stateless = { workspace = true, optional = true }
 ere-io = { workspace = true, features = ["rkyv"] }
 ere-zkvm-interface = { workspace = true, optional = true }
 
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }
+
 # local
 guest.workspace = true
 stateless-validator-common = { workspace = true, features = ["rkyv"] }

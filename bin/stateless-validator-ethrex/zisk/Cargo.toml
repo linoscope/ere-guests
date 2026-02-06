@@ -25,6 +25,14 @@ tiny-keccak = { git = "https://github.com/0xPolygonHermez/zisk-patch-tiny-keccak
 kzg-rs = { git = "https://github.com/0xPolygonHermez/zisk-patch-kzg/", tag = "patch-0.2.7-zisk-0.15.0" }
 ethereum_hashing = { git = "https://github.com/jsign/ethereum_hashing", rev = "08c88633b700d7447ef840d19ce7b369c44311de" }
 
+[patch."https://github.com/lambdaclass/ethrex.git"]
+ethrex-common = { git = "https://github.com/jsign/ethrex.git", rev = "cc12aa29c03f33e7992eaa7c312e3518ab6ddd7f" }
+guest_program = { git = "https://github.com/jsign/ethrex.git", rev = "cc12aa29c03f33e7992eaa7c312e3518ab6ddd7f" }
+ethrex-rlp = { git = "https://github.com/jsign/ethrex.git", rev = "cc12aa29c03f33e7992eaa7c312e3518ab6ddd7f" }
+ethrex-rpc = { git = "https://github.com/jsign/ethrex.git", rev = "cc12aa29c03f33e7992eaa7c312e3518ab6ddd7f" }
+ethrex-vm = { git = "https://github.com/jsign/ethrex.git", rev = "cc12aa29c03f33e7992eaa7c312e3518ab6ddd7f" }
+
+
 [profile.release]
 codegen-units = 1
 lto = "fat"
