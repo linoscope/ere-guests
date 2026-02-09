@@ -13,3 +13,5 @@ sha2.workspace = true
 
 ere-io.workspace = true
 ere-platform-trait.workspace = true
+
+ziskos = { git = "https://github.com/0xPolygonHermez/zisk.git", tag = "v0.15.0" }

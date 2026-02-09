@@ -7,6 +7,7 @@ use core::convert::identity;
 use ere_io::Io;
 use ere_platform_trait::Platform;
 use sha2::{Digest, Sha256};
+use ziskos::{ziskos_profile_end, ziskos_profile_start};
 
 /// Guest program that can be ran given [`Platform`] implementation.
 pub trait Guest {

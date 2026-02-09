@@ -7,7 +7,7 @@ use std::{
 
 use ere_dockerized::{CompilerKind, DockerizedCompiler, DockerizedzkVM, zkVMKind};
 use ere_io::Io;
-use ere_zkvm_interface::{Compiler, Input, ProverResourceType, zkVM};
+use ere_zkvm_interface::{Compiler, Input, ProverResource, zkVM};
 use flate2::read::GzDecoder;
 use guest::{Guest, GuestInput, GuestOutput, Platform};
 use rayon::prelude::*;
@@ -74,7 +74,7 @@ pub fn compile_and_init_zkvm(guest: &str, zkvm_kind: zkVMKind) -> DockerizedzkVM
     let bin = workspace.join("bin").join(guest).join(zkvm_kind.as_str());
     let program = compiler.compile(&bin).unwrap();
 
-    DockerizedzkVM::new(zkvm_kind, program, ProverResourceType::Cpu).unwrap()
+    DockerizedzkVM::new(zkvm_kind, program, ProverResource::Cpu).unwrap()
 }
 
 /// Compiles guest program and runs execution, then check output are expected.
