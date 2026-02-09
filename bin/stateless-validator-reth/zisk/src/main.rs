@@ -8,6 +8,7 @@ use stateless_validator_reth::guest::{Guest, StatelessValidatorRethGuest};
 ziskos::entrypoint!(main);
 
 fn main() {
+    StatelessValidatorRethGuest::run_output_sha256::<ZiskPlatform>();
     export_cycle_scope_names!(
         read_input,
         deserialize_input,
@@ -19,5 +20,4 @@ fn main() {
         sha256_output_bytes,
         write_output,
     );
-    StatelessValidatorRethGuest::run_output_sha256::<ZiskPlatform>();
 }
