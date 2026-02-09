@@ -7,7 +7,6 @@ use ere_io::rkyv::IoRkyv;
 use ethrex_common::types::{block_execution_witness::ExecutionWitness, fee_config::FeeConfig};
 use ethrex_guest_program::{execution::execution_program, input::ProgramInput};
 use stateless_validator_common::new_payload_request::NewPayloadRequest;
-use ziskos::{ziskos_profile_end, ziskos_profile_start};
 
 use crate::new_payload_request::get_block_from_new_payload_request;
 
@@ -83,12 +82,10 @@ impl Guest for StatelessValidatorEthrexGuest {
     type Io = StatelessValidatorEthrexIo;
 
     fn compute<P: Platform>(input: GuestInput<Self>) -> GuestOutput<Self> {
-        ziskos_profile_start!(NEW_PAYLOAD_REQUEST_ROOT = 20);
         let new_payload_request_root =
             P::cycle_scope("new_payload_request_root_calculation", || {
                 input.new_payload_request.tree_hash_root()
             });
-        ziskos_profile_end!(NEW_PAYLOAD_REQUEST_ROOT);
 
         #[cfg(feature = "std")]
         {
@@ -117,11 +114,9 @@ impl StatelessValidatorEthrexGuest {
         input: GuestInput<Self>,
         new_payload_request_root: [u8; 32],
     ) -> GuestOutput<Self> {
-        ziskos_profile_start!(NEW_PAYLOAD_REQUEST_TO_BLOCK = 21);
         let block_res = P::cycle_scope("new_payload_request_to_block", || {
             get_block_from_new_payload_request(input.new_payload_request)
         });
-        ziskos_profile_end!(NEW_PAYLOAD_REQUEST_TO_BLOCK);
         let block = match block_res {
             Ok(block) => block,
             Err(err) => {
@@ -130,7 +125,6 @@ impl StatelessValidatorEthrexGuest {
             }
         };
 
-        ziskos_profile_start!(MISC_PREPARATION = 22);
         let (input, block_num) = P::cycle_scope("misc_preparation", || {
             let input = ProgramInput {
                 blocks: vec![block],
@@ -141,11 +135,8 @@ impl StatelessValidatorEthrexGuest {
             let block_num = input.blocks[0].header.number;
             (input, block_num)
         });
-        ziskos_profile_end!(MISC_PREPARATION);
 
-        ziskos_profile_start!(STF = 23);
         let res = P::cycle_scope("stf", || execution_program(input));
-        ziskos_profile_end!(STF);
 
         match res {
             Ok(_) => StatelessValidatorOutput::new(new_payload_request_root, true),

@@ -2,7 +2,7 @@
 
 #![no_main]
 
-use ere_platform_zisk::{export_cycle_scope_names, ziskos, ZiskPlatform};
+use ere_platform_zisk::{ZiskPlatform, export_cycle_scope_names, ziskos};
 use stateless_validator_reth::guest::{Guest, StatelessValidatorRethGuest};
 
 ziskos::entrypoint!(main);
