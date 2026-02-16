@@ -1130,7 +1130,7 @@ checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 [[package]]
 name = "ere-io"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.2.0#a274f17c4a1a8843ccdb8febcf0ec56afb457745"
+source = "git+https://github.com/eth-act/ere?rev=25612458ee98445a38d8db7d9bd5f525cdf15797#25612458ee98445a38d8db7d9bd5f525cdf15797"
 dependencies = [
  "rkyv",
 ]
@@ -1138,7 +1138,7 @@ dependencies = [
 [[package]]
 name = "ere-platform-trait"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.2.0#a274f17c4a1a8843ccdb8febcf0ec56afb457745"
+source = "git+https://github.com/eth-act/ere?rev=25612458ee98445a38d8db7d9bd5f525cdf15797#25612458ee98445a38d8db7d9bd5f525cdf15797"
 dependencies = [
  "digest 0.10.7",
 ]
@@ -1146,9 +1146,10 @@ dependencies = [
 [[package]]
 name = "ere-platform-zisk"
 version = "0.2.0"
-source = "git+https://github.com/eth-act/ere?tag=v0.2.0#a274f17c4a1a8843ccdb8febcf0ec56afb457745"
+source = "git+https://github.com/eth-act/ere?rev=25612458ee98445a38d8db7d9bd5f525cdf15797#25612458ee98445a38d8db7d9bd5f525cdf15797"
 dependencies = [
  "ere-platform-trait",
+ "fnv",
  "ziskos",
 ]
 

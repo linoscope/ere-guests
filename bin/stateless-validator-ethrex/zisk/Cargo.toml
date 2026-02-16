@@ -7,7 +7,7 @@ version = "0.1.0"
 
 [dependencies]
 # ere
-ere-platform-zisk = { git = "https://github.com/eth-act/ere", tag = "v0.2.0" }
+ere-platform-zisk = { git = "https://github.com/eth-act/ere", rev = "25612458ee98445a38d8db7d9bd5f525cdf15797" }
 
 # local
 stateless-validator-ethrex = { path = "../../../crates/stateless-validator-ethrex", features = [
