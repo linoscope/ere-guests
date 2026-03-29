@@ -1,6 +1,6 @@
 //! Stateless validator guest program.
 
-use alloc::{format, sync::Arc};
+use alloc::{format, sync::Arc, vec};
 use core::fmt::Debug;
 
 use ere_io::rkyv::IoRkyv;

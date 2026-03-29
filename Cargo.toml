@@ -112,3 +112,11 @@ block-encoding-length = { path = "crates/block-encoding-length", default-feature
 stateless-validator-common = { path = "crates/stateless-validator-common", default-features = false }
 stateless-validator-ethrex = { path = "crates/stateless-validator-ethrex", default-features = false }
 stateless-validator-reth = { path = "crates/stateless-validator-reth", default-features = false }
+
+[patch."https://github.com/lambdaclass/ethrex.git"]
+ethrex-common = { git = "https://github.com/jsign/ethrex.git", rev = "5c08f11dcd1f5f9191110b55daefbfbe5a0c9489" }
+ethrex-crypto = { git = "https://github.com/jsign/ethrex.git", rev = "5c08f11dcd1f5f9191110b55daefbfbe5a0c9489" }
+ethrex-guest-program = { git = "https://github.com/jsign/ethrex.git", rev = "5c08f11dcd1f5f9191110b55daefbfbe5a0c9489" }
+ethrex-rlp = { git = "https://github.com/jsign/ethrex.git", rev = "5c08f11dcd1f5f9191110b55daefbfbe5a0c9489" }
+ethrex-rpc = { git = "https://github.com/jsign/ethrex.git", rev = "5c08f11dcd1f5f9191110b55daefbfbe5a0c9489" }
+ethrex-vm = { git = "https://github.com/jsign/ethrex.git", rev = "5c08f11dcd1f5f9191110b55daefbfbe5a0c9489" }
