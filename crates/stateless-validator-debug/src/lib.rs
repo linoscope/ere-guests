@@ -52,17 +52,20 @@ pub enum GuestKind {
 }
 
 impl GuestKind {
-    fn run_fixture(self, fixture: &StatelessValidatorFixture) -> anyhow::Result<RunSummary> {
+    fn compute_with_platform<P: Platform>(
+        self,
+        fixture: &StatelessValidatorFixture,
+    ) -> anyhow::Result<RunSummary> {
         let output: StatelessValidatorOutput = match self {
             Self::Reth => {
                 let input =
                     StatelessValidatorRethInput::new(&fixture.stateless_input, fixture.success)?;
-                StatelessValidatorRethGuest::compute::<StdoutNoopPlatform>(input)
+                StatelessValidatorRethGuest::compute::<P>(input)
             }
             Self::Ethrex => {
                 let input =
                     StatelessValidatorEthrexInput::new(&fixture.stateless_input, fixture.success)?;
-                StatelessValidatorEthrexGuest::compute::<StdoutNoopPlatform>(input)
+                StatelessValidatorEthrexGuest::compute::<P>(input)
             }
         };
 
@@ -81,6 +84,14 @@ impl GuestKind {
             Self::Ethrex => "ethrex",
         }
     }
+}
+
+/// Runs one fixture directly on the host without printing guest debug output.
+pub fn run_fixture(
+    guest: GuestKind,
+    fixture: &StatelessValidatorFixture,
+) -> anyhow::Result<RunSummary> {
+    guest.compute_with_platform::<SilentNoopPlatform>(fixture)
 }
 
 /// Deserialized JSON fixture supported by the debug runner.
@@ -150,6 +161,24 @@ impl Platform for StdoutNoopPlatform {
     }
 }
 
+/// A no-op platform for host-side guest execution that discards debug messages.
+#[derive(Debug)]
+pub struct SilentNoopPlatform;
+
+impl Platform for SilentNoopPlatform {
+    #[allow(unreachable_code)]
+    fn read_whole_input() -> impl std::ops::Deref<Target = [u8]> {
+        panic!("Can't read input in SilentNoopPlatform");
+        &[] as &[u8]
+    }
+
+    fn write_whole_output(_: &[u8]) {
+        panic!("Can't write output in SilentNoopPlatform");
+    }
+
+    fn print(_: &str) {}
+}
+
 /// Entry point for the debug runner binary.
 pub fn main_entry() -> anyhow::Result<()> {
     init_tracing();
@@ -198,7 +227,7 @@ fn run_fixtures(
 fn run_fixture_path(guest: GuestKind, fixture_path: &Path) -> anyhow::Result<FixtureRun> {
     let fixture = load_fixture(fixture_path)?;
     let summary = guest
-        .run_fixture(&fixture)
+        .compute_with_platform::<StdoutNoopPlatform>(&fixture)
         .with_context(|| format!("failed to execute fixture {}", fixture_path.display()))?;
 
     Ok(FixtureRun {
