@@ -6092,6 +6092,7 @@ dependencies = [
  "anyhow",
  "clap",
  "guest",
+ "rayon",
  "serde",
  "serde_json",
  "stateless",

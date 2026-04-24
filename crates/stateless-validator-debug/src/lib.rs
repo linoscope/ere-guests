@@ -6,9 +6,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{Context, bail};
+use anyhow::{Context, bail, ensure};
 use clap::{Parser, ValueEnum};
 use guest::{Guest, Platform};
+use rayon::{ThreadPoolBuilder, prelude::*};
 use serde::Deserialize;
 use stateless::StatelessInput;
 use stateless_validator_ethrex::guest::{
@@ -34,6 +35,9 @@ pub struct Cli {
     /// Warn and continue when fixture success does not match guest output.
     #[arg(long)]
     pub allow_success_mismatch: bool,
+    /// Number of fixtures to run in parallel.
+    #[arg(long, default_value_t = 1)]
+    pub jobs: usize,
     /// Path to a fixture file or directory.
     pub path: PathBuf,
 }
@@ -105,6 +109,12 @@ pub struct RunSummary {
     pub new_payload_request_root: [u8; 32],
 }
 
+#[derive(Debug)]
+struct FixtureRun {
+    path: PathBuf,
+    summary: RunSummary,
+}
+
 impl std::fmt::Display for RunSummary {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
@@ -149,19 +159,52 @@ pub fn main_entry() -> anyhow::Result<()> {
 /// Executes one or more fixtures and reports each summary via `on_summary`.
 pub fn execute(cli: Cli, mut on_summary: impl FnMut(&RunSummary)) -> anyhow::Result<()> {
     let fixture_paths = collect_fixture_paths(&cli.path)?;
+    ensure!(cli.jobs > 0, "--jobs must be greater than 0");
+    let runs = run_fixtures(cli.guest, cli.jobs, fixture_paths)?;
 
-    for fixture_path in fixture_paths {
-        let fixture = load_fixture(&fixture_path)?;
-        let summary = cli
-            .guest
-            .run_fixture(&fixture)
-            .with_context(|| format!("failed to execute fixture {}", fixture_path.display()))?;
-        on_summary(&summary);
-
-        handle_success_mismatch(&summary, &fixture_path, cli.allow_success_mismatch)?;
+    for run in runs {
+        on_summary(&run.summary);
+        handle_success_mismatch(&run.summary, &run.path, cli.allow_success_mismatch)?;
     }
 
     Ok(())
+}
+
+fn run_fixtures(
+    guest: GuestKind,
+    jobs: usize,
+    fixture_paths: Vec<PathBuf>,
+) -> anyhow::Result<Vec<FixtureRun>> {
+    if jobs == 1 || fixture_paths.len() <= 1 {
+        return fixture_paths
+            .iter()
+            .map(|fixture_path| run_fixture_path(guest, fixture_path))
+            .collect();
+    }
+
+    let pool = ThreadPoolBuilder::new()
+        .num_threads(jobs)
+        .build()
+        .context("failed to create fixture worker pool")?;
+
+    pool.install(|| {
+        fixture_paths
+            .par_iter()
+            .map(|fixture_path| run_fixture_path(guest, fixture_path))
+            .collect()
+    })
+}
+
+fn run_fixture_path(guest: GuestKind, fixture_path: &Path) -> anyhow::Result<FixtureRun> {
+    let fixture = load_fixture(fixture_path)?;
+    let summary = guest
+        .run_fixture(&fixture)
+        .with_context(|| format!("failed to execute fixture {}", fixture_path.display()))?;
+
+    Ok(FixtureRun {
+        path: fixture_path.to_path_buf(),
+        summary,
+    })
 }
 
 fn init_tracing() {
