@@ -28,9 +28,14 @@ alloy-rpc-types-engine = { workspace = true, default-features = false, features 
 reth-chainspec.workspace = true
 reth-payload-validator = { workspace = true, default-features = false }
 reth-ethereum-primitives.workspace = true
-reth-evm-ethereum.workspace = true
+reth-ethereum-forks.workspace = true
 reth-primitives-traits.workspace = true
 stateless.workspace = true
+
+# alethia-reth (Taiko's fork; provides TaikoEvmConfig with ZkGasInspector)
+alethia-reth-block = { workspace = true, default-features = false }
+alethia-reth-chainspec = { workspace = true, default-features = false }
+alloy-hardforks.workspace = true
 
 # mpt
 tries.workspace = true
@@ -49,7 +54,12 @@ stateless-validator-common = { workspace = true, features = ["serde"] }
 [features]
 # guest
 default = ["std"]
-std = ["once_cell/std", "stateless-validator-common/std"]
+std = [
+    "once_cell/std",
+    "stateless-validator-common/std",
+    "alethia-reth-block/std",
+    "alethia-reth-chainspec/std",
+]
 openvm = []
 zisk = []
 

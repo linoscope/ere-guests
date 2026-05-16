@@ -1,11 +1,15 @@
 //! [`Guest`] implementation for Reth stateless validator.
 
-use alloc::{format, sync::Arc, vec::Vec};
+use alloc::{format, sync::Arc, vec, vec::Vec};
 
+use alethia_reth_block::config::TaikoEvmConfig;
+use alethia_reth_chainspec::{hardfork::TaikoHardfork, spec::TaikoChainSpec};
 use alloy_genesis::ChainConfig;
+use alloy_hardforks::{EthereumHardfork, ForkCondition, Hardfork};
+use alloy_primitives::U256;
 use guest::codec::impl_codec_by_bincode_legacy;
 use reth_chainspec::ChainSpec;
-use reth_evm_ethereum::EthEvmConfig;
+use reth_ethereum_forks::ChainHardforks;
 use serde::{Deserialize, Serialize};
 use serde_with::serde_as;
 use stateless::{ExecutionWitness, Genesis, UncompressedPublicKey, stateless_validation_with_trie};
@@ -84,12 +88,57 @@ impl StatelessValidatorRethGuest {
         new_payload_request_root: [u8; 32],
     ) -> GuestOutput<Self> {
         let (chain_spec, evm_config) = P::cycle_scope("misc_preparation", || {
+            let chain_id = input.chain_config.chain_id;
             let genesis = Genesis {
                 config: input.chain_config.clone(),
                 ..Default::default()
             };
-            let chain_spec: Arc<ChainSpec> = Arc::new(genesis.into());
-            let evm_config = EthEvmConfig::new(chain_spec.clone());
+
+            // Activate TaikoHardfork::Unzen at timestamp 0 so the ZkGasInspector fires for
+            // every opcode. We deliberately leave EthereumHardfork::Osaka inactive — Unzen
+            // selects Osaka semantics in revm, but `is_osaka_active_at_timestamp` is what
+            // gates the 30M tx-gas-limit cap in TaikoEvmConfig::evm_env, and our stress
+            // fixtures use 50M per-tx limits.
+            let block0 = ForkCondition::Block(0);
+            let ts0 = ForkCondition::Timestamp(0);
+            let hardforks = ChainHardforks::new(vec![
+                (EthereumHardfork::Frontier.boxed(), block0),
+                (EthereumHardfork::Homestead.boxed(), block0),
+                (EthereumHardfork::Tangerine.boxed(), block0),
+                (EthereumHardfork::SpuriousDragon.boxed(), block0),
+                (EthereumHardfork::Byzantium.boxed(), block0),
+                (EthereumHardfork::Constantinople.boxed(), block0),
+                (EthereumHardfork::Petersburg.boxed(), block0),
+                (EthereumHardfork::Istanbul.boxed(), block0),
+                (EthereumHardfork::MuirGlacier.boxed(), block0),
+                (EthereumHardfork::Berlin.boxed(), block0),
+                (EthereumHardfork::London.boxed(), block0),
+                (EthereumHardfork::ArrowGlacier.boxed(), block0),
+                (EthereumHardfork::GrayGlacier.boxed(), block0),
+                (
+                    EthereumHardfork::Paris.boxed(),
+                    ForkCondition::TTD {
+                        activation_block_number: 0,
+                        fork_block: Some(0),
+                        total_difficulty: U256::ZERO,
+                    },
+                ),
+                (EthereumHardfork::Shanghai.boxed(), ts0),
+                (EthereumHardfork::Cancun.boxed(), ts0),
+                (EthereumHardfork::Prague.boxed(), ts0),
+                (TaikoHardfork::Ontake.boxed(), block0),
+                (TaikoHardfork::Pacaya.boxed(), block0),
+                (TaikoHardfork::Shasta.boxed(), ts0),
+                (TaikoHardfork::Unzen.boxed(), ts0),
+            ]);
+
+            let inner = ChainSpec::builder()
+                .chain(chain_id.into())
+                .genesis(genesis)
+                .with_forks(hardforks)
+                .build();
+            let chain_spec = Arc::new(TaikoChainSpec { inner });
+            let evm_config = TaikoEvmConfig::new(chain_spec.clone());
             (chain_spec, evm_config)
         });
 

@@ -12,7 +12,7 @@ use alloy_rpc_types_engine::{
     ExecutionPayloadV4 as AlloyExecutionPayloadV4, PayloadError,
 };
 use anyhow::{Context, Result};
-use reth_chainspec::{ChainSpec, EthereumHardforks};
+use reth_chainspec::EthereumHardforks;
 use reth_payload_validator::{cancun, prague, shanghai};
 use reth_primitives_traits::{Block as _, SealedBlock, SignedTransaction};
 use stateless_validator_common::new_payload_request::{
@@ -21,10 +21,13 @@ use stateless_validator_common::new_payload_request::{
 };
 
 /// Converts a [`NewPayloadRequest`] into a validated reth [`Block`].
-pub fn new_payload_request_to_block(
+pub fn new_payload_request_to_block<C>(
     new_payload_request: NewPayloadRequest,
-    chain_spec: Arc<ChainSpec>,
-) -> Result<SealedBlock<Block<reth_ethereum_primitives::TransactionSigned>>> {
+    chain_spec: Arc<C>,
+) -> Result<SealedBlock<Block<reth_ethereum_primitives::TransactionSigned>>>
+where
+    C: EthereumHardforks,
+{
     let execution_data = new_payload_request_to_execution_data(new_payload_request);
     let sealed_block = ensure_well_formed_payload(chain_spec, execution_data)
         .context("Payload validation failed")?;
