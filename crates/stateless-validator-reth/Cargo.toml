@@ -54,12 +54,11 @@ stateless-validator-common = { workspace = true, features = ["serde"] }
 [features]
 # guest
 default = ["std"]
-std = [
-    "once_cell/std",
-    "stateless-validator-common/std",
-    "alethia-reth-block/std",
-    "alethia-reth-chainspec/std",
-]
+# NOTE: deliberately do NOT propagate `std` to alethia-reth crates. Their `std` feature
+# turns on `reth-primitives-traits/std`, which pulls `quanta` — quanta uses
+# `libc::clock_gettime` not available in SP1's RV64IMA std shim. Matches the pattern in
+# https://github.com/taikoxyz/raiko2 (which uses alethia-reth with `prover` only).
+std = ["once_cell/std", "stateless-validator-common/std"]
 openvm = []
 zisk = []
 
